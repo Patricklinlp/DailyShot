@@ -10,7 +10,6 @@ import com.lp.dailyshot.util.ResUtil;
  */
 
 public class GalleryFragment extends BaseFragment {
-    protected String mTag = "GalleryFragment";
 
     public GalleryFragment() {
         super();

@@ -15,6 +15,7 @@ public class AppUtil {
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE" };
+    private static final String PHOTO_PATH = android.os.Environment.getExternalStorageDirectory() + "/dailyShot/Camera/";
 
     private static Context sAppContext;
 
@@ -39,5 +40,13 @@ public class AppUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getPhotoRootPath() {
+        return PHOTO_PATH;
+    }
+
+    public static String getTodayPhotoPath() {
+        return PHOTO_PATH + DateUtil.today() + ".jpg";
     }
 }

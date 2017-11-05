@@ -1,5 +1,8 @@
 package com.lp.dailyshot.fragment;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,14 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.lp.dailyshot.R;
 import com.lp.dailyshot.util.AppUtil;
+import com.lp.dailyshot.util.FileUtil;
 import com.lp.dailyshot.util.LogUtil;
 import com.lp.dailyshot.util.ResUtil;
-
-import java.io.File;
-import java.util.Date;
 
 /**
  * Created by Patrick on 2017/10/22.
@@ -24,12 +26,14 @@ import java.util.Date;
 
 public class CameraFragment extends BaseFragment {
 
+    private static final int STATE_TAKE_PHOTO = 1;
+    private static final int STATE_SHOW_PHOTO = 2;
+
+    public static final int REQUEST_CODE_CAMERA = 101;
+
     private View mContentView;
     private ImageView mCameraButton;
     private ImageView mTodayPhoto;
-    private String mFilePath = android.os.Environment.getExternalStorageDirectory() + "/dailyShot/Camera/";
-    private String mTodayFileName;
-    public static final int REQUEST_CODE_CAMERA = 101;
 
     public CameraFragment() {
         super();
@@ -48,14 +52,45 @@ public class CameraFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        LogUtil.d(mTag, "onCreateView(inflater:" + inflater + ", container:" + container + ", savedInstanceState:" + savedInstanceState + ")");
         mContentView = inflater.inflate(R.layout.fragment_camera, container, false);
+        initViews();
+        AppUtil.verifyStoragePermissions(getActivity());
+        FileUtil.checkAndMakeDirs(AppUtil.getPhotoRootPath());
+        return mContentView;
+    }
+
+    private void initViews() {
         mCameraButton = ResUtil.findViewById(R.id.camera, mContentView);
         mCameraButton.setOnClickListener(mCameraClickListener);
         mTodayPhoto = ResUtil.findViewById(R.id.today_photo, mContentView);
+        mTodayPhoto.setOnLongClickListener(mPhotoLongClickListener);
+    }
 
-        AppUtil.verifyStoragePermissions(getActivity());
-        checkDir(mFilePath);
-        return mContentView;
+    private View.OnLongClickListener mPhotoLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            showDeleteConfirmDialog();
+            return true;
+        }
+    };
+
+    private void showDeleteConfirmDialog() {
+        AlertDialog.Builder ab = new AlertDialog.Builder(getActivity());
+        ab.setTitle(ResUtil.getString(R.string.delete_confirm));
+        ab.setPositiveButton(ResUtil.getString(R.string.yes), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (FileUtil.delete(AppUtil.getTodayPhotoPath())) {
+                    Toast.makeText(AppUtil.getApplicationContext(), ResUtil.getString(R.string.delete_success), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(AppUtil.getApplicationContext(), ResUtil.getString(R.string.delete_fail), Toast.LENGTH_SHORT).show();
+                }
+                refreshViewState();
+            }
+        });
+        ab.setNegativeButton(ResUtil.getString(R.string.no), null);
+        ab.show();
     }
 
     private View.OnClickListener mCameraClickListener = new View.OnClickListener() {
@@ -65,23 +100,9 @@ public class CameraFragment extends BaseFragment {
         }
     };
 
-    private void checkDir(String filePath) {
-        File file = new File(mFilePath);
-        LogUtil.d(mTag, "file exists:" + file.exists());
-        if (file.exists()) {
-            return;
-        }
-        LogUtil.d(mTag, "file.isDirectory:" + file.isDirectory());
-        if (file.isDirectory()) {
-            LogUtil.d(mTag, "file mkdirs:" + filePath);
-            file.mkdirs();
-        }
-        file.mkdirs();
-    }
-
     private void startCameraActivity() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse("file://" + mFilePath + new Date().getDay() + ".jpg"));
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse("file://" + AppUtil.getTodayPhotoPath()));
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
 
@@ -97,15 +118,24 @@ public class CameraFragment extends BaseFragment {
 
     @Override
     public void onResume() {
-        mTodayFileName = mFilePath + new Date().getDay() + ".jpg";
-        if (new File(mTodayFileName).exists()) {
+        refreshViewState();
+        super.onResume();
+    }
+
+    private void refreshViewState() {
+        int state = FileUtil.exists(AppUtil.getTodayPhotoPath())? STATE_SHOW_PHOTO : STATE_TAKE_PHOTO;
+        switchState(state);
+    }
+
+    private void switchState(int state) {
+        if (state == STATE_SHOW_PHOTO) {
             mCameraButton.setVisibility(View.GONE);
-            mTodayPhoto.setImageURI(Uri.parse(mTodayFileName));
+            mTodayPhoto.setImageURI(Uri.parse("file://" + AppUtil.getTodayPhotoPath()));
             mTodayPhoto.setVisibility(View.VISIBLE);
+            mTodayPhoto.requestLayout();
         } else {
             mCameraButton.setVisibility(View.VISIBLE);
             mTodayPhoto.setVisibility(View.GONE);
         }
-        super.onResume();
     }
 }

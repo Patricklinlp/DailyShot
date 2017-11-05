@@ -3,5 +3,10 @@
     <string name="tab_name_today">今天</string>
     <string name="tab_name_yesterday">昨天</string>
     <string name="tab_name_config">设置</string>
+    <string name="delete_confirm">删除这张照片？</string>
+    <string name="yes">确定</string>
+    <string name="no">取消</string>
+    <string name="delete_success">删除成功。</string>
+    <string name="delete_fail">删除失败。</string>
 
 </resources>
