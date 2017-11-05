@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DailyShot</string>
+    <string name="tab_name_today">今天</string>
+    <string name="tab_name_yesterday">昨天</string>
+    <string name="tab_name_config">设置</string>
+
+</resources>
