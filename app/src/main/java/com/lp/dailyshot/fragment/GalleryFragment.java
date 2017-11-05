@@ -14,7 +14,6 @@ public class GalleryFragment extends BaseFragment {
 
     public GalleryFragment() {
         super();
-        mTag = "GalleryFragment";
     }
 
     @Override

@@ -33,7 +33,6 @@ public class CameraFragment extends BaseFragment {
 
     public CameraFragment() {
         super();
-        mTag = "CameraFragment";
     }
 
     @Override
