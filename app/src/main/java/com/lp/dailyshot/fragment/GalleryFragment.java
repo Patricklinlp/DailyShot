@@ -21,4 +21,9 @@ public class GalleryFragment extends BaseFragment {
     public String getTitle() {
         return ResUtil.getString(R.string.tab_name_yesterday);
     }
+
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
 }

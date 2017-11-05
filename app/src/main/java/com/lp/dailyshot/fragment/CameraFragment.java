@@ -41,6 +41,11 @@ public class CameraFragment extends BaseFragment {
         return ResUtil.getString(R.string.tab_name_today);
     }
 
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -14,7 +14,6 @@ import com.lp.dailyshot.fragment.BaseFragment;
 import com.lp.dailyshot.fragment.CameraFragment;
 import com.lp.dailyshot.fragment.FragmentHolder;
 import com.lp.dailyshot.fragment.GalleryFragment;
-import com.lp.dailyshot.fragment.TestFragment;
 import com.lp.dailyshot.util.ResUtil;
 
 import java.util.ArrayList;

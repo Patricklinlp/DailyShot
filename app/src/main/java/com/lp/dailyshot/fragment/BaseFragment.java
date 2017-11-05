@@ -21,8 +21,11 @@ public abstract class BaseFragment extends Fragment {
 
     public abstract String getTitle();
 
+    public abstract String getName();
+
     public BaseFragment() {
         super();
+        mTag += "/" + getName();
     }
 
     @Nullable
